@@ -2,7 +2,7 @@ all:
 	go build
 
 test:
-	./momotunnel
+	./momotunnel :8080 cseweb.ucsd.edu:80
 
 clean:
 	rm momotunnel

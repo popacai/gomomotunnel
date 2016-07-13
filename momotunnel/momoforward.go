@@ -11,7 +11,7 @@ type MomoForward struct {
 	dst net.Conn
 }
 
-func (self MomoForward) Dup() {
+func (self *MomoForward) Dup() {
 	for {
 		n, err := io.Copy(self.src, self.dst)
 		if err != nil || n == 0 {
@@ -22,7 +22,7 @@ func (self MomoForward) Dup() {
 	self.Close()
 }
 
-func (self MomoForward) Close() {
+func (self *MomoForward) Close() {
 	self.src.Close()
 	self.dst.Close()
 }

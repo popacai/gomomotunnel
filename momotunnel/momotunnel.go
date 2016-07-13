@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net"
 )
@@ -14,19 +13,18 @@ type MomoTunnel struct {
 	listener net.Listener
 }
 
-func (self MomoTunnel) Start() error {
+func (self *MomoTunnel) Start() error {
 	var err error
 	self.signal = make(chan int)
 	self.listener, err = net.Listen("tcp", self.src)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return err
 	}
 	go self.Run()
 	return nil
 }
 
-func (self MomoTunnel) Stop() error {
+func (self *MomoTunnel) Stop() error {
 	if self.signal == nil {
 		err := errors.New("momotunnel is not running")
 		return err
@@ -38,7 +36,7 @@ func (self MomoTunnel) Stop() error {
 	return nil
 }
 
-func (self MomoTunnel) Join() error {
+func (self *MomoTunnel) Join() error {
 	if self.signal == nil {
 		err := errors.New("momotunnel is not running")
 		return err
@@ -48,7 +46,7 @@ func (self MomoTunnel) Join() error {
 	return nil
 }
 
-func (self MomoTunnel) Run() {
+func (self *MomoTunnel) Run() {
 	//This is a block IO
 	for {
 		conn, err := self.listener.Accept()
@@ -61,7 +59,7 @@ func (self MomoTunnel) Run() {
 	defer self.listener.Close()
 }
 
-func (self MomoTunnel) HandleConnection(local_sock net.Conn) {
+func (self *MomoTunnel) HandleConnection(local_sock net.Conn) {
 	remote_sock, err := net.Dial("tcp", self.dst)
 	if err != nil {
 		log.Println(err)
@@ -74,13 +72,4 @@ func (self MomoTunnel) HandleConnection(local_sock net.Conn) {
 	self.Join()
 	momo1.Close()
 	momo2.Close()
-}
-
-func main() {
-	tunnel := MomoTunnel{":8091", "cseweb.ucsd.edu:80", nil, nil}
-	tunnel.Start()
-	var input string
-	fmt.Scanln(&input)
-	// tunnel.Join()
-	tunnel.Stop()
 }
