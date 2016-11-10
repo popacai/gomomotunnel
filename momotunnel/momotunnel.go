@@ -15,7 +15,7 @@ type MomoTunnel struct {
 
 func (self *MomoTunnel) Start() error {
 	var err error
-	self.signal = make(chan int)
+	self.signal = make(chan int, 1)
 	self.listener, err = net.Listen("tcp", self.src)
 	if err != nil {
 		return err

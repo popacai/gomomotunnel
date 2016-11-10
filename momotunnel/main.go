@@ -5,23 +5,26 @@ import (
 	"os"
 	"os/signal"
 	// use cli pakcage in future
+	"flag"
 )
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("usage: momotunnel src_host:src_port dst_host:dst_port")
-		return
-	}
-	src := os.Args[1]
-	dst := os.Args[2]
-	// src = ":8000"
-	// dst = "popacai.com:8000"
-
-	c := make(chan os.Signal, 1)
+	c := make(chan os.Signal, 5)
 	signal.Notify(c, os.Interrupt)
 
-	tunnel := MomoTunnel{src, dst, nil, nil}
-	tunnel.Start()
+	src := flag.String("src", ":5000", "source ip and port, such as :7000")
+	dst := flag.String("dst", "localhost:80", "destination ip and port, such as popacai.com:80")
+	// src = ":8000"
+	// dst = "popacai.com:8000"
+	flag.Parse()
+
+	tunnel := MomoTunnel{*src, *dst, nil, nil}
+	err := tunnel.Start()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("ctrl+c to exit")
 	<-c
 	tunnel.Stop()
 }
